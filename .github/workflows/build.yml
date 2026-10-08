@@ -42,15 +42,16 @@ jobs:
           done
         fi
 
-    - name: Run custom pre-build script
-      run: 'if [[ ! -f pre-build.sh ]]; then
-    echo "::error::pre-build.sh NOT FOUND"
-    exit 1
-fi
+      - name: Run custom pre-build script
+        run: |
+          if [[ ! -f pre-build.sh ]]; then
+            echo "::error::pre-build.sh NOT FOUND"
+            exit 1
+          fi
 
-echo "===== STARTING pre-build.sh ====="
-bash pre-build.sh
-echo "===== pre-build.sh FINISHED OK ====="'
+          echo "===== STARTING pre-build.sh ====="
+          bash pre-build.sh
+          echo "===== pre-build.sh FINISHED OK ====="
 
     - name: Build firmware
       run: |
