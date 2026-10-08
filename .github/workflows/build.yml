@@ -23,35 +23,27 @@ jobs:
           echo "$v=${!v}" >> $GITHUB_ENV
         done
 
-      - name: Download sources and toolchain
-        run: |
-          git config --global --add safe.directory '*'
-          git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
-          git -C padavan-ng checkout "$PADAVAN_COMMIT"
-          wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
+    - name: Download sources and toolchain
+      run: |
+        git config --global --add safe.directory '*'
+        git clone -b "$PADAVAN_BRANCH" "$PADAVAN_REPO"
+        git -C padavan-ng checkout "$PADAVAN_COMMIT"
+        wget -qO- "$PADAVAN_TOOLCHAIN_URL" | tar -C padavan-ng --zstd -xf -
 
-      - name: Install themes
-        run: |
-          if [[ -n "$PADAVAN_THEMES" ]]; then
-            git clone --depth 1 -b "$PADAVAN_THEMES_BRANCH" "$PADAVAN_THEMES_REPO" themes
-            cp -r themes/common-theme themes/jquery-js padavan-ng/trunk/user/www/n56u_ribbon_fixed
+    - name: Install themes
+      run: |
+        if [[ -n $PADAVAN_THEMES ]]; then
+          git clone --depth 1 -b "$PADAVAN_THEMES_BRANCH" "$PADAVAN_THEMES_REPO" themes
+          cp -r themes/common-theme themes/jquery.js padavan-ng/trunk/user/www/n56u_ribbon_fixed
 
-            for theme in $PADAVAN_THEMES; do
-              echo "Installing $theme theme"
-              cp -r "themes/$theme-theme" padavan-ng/trunk/user/www/n56u_ribbon_fixed
-            done
-          fi
+          for theme in $PADAVAN_THEMES; do
+            echo "Installing $theme theme"
+            cp -r "themes/$theme-theme" padavan-ng/trunk/user/www/n56u_ribbon_fixed
+          done
+        fi
 
-      - name: Run custom pre-build script
-        run: |
-          if [[ ! -f pre-build.sh ]]; then
-            echo "::error::pre-build.sh NOT FOUND"
-            exit 1
-          fi
-
-          echo "===== STARTING pre-build.sh ====="
-          bash pre-build.sh
-          echo "===== pre-build.sh FINISHED OK ====="
+    - name: Run custom pre-build script
+      run: '[[ -f pre-build.sh ]] && . pre-build.sh || :'
 
     - name: Build firmware
       run: |
